@@ -109,7 +109,7 @@ always_comb begin
 			end
 		STOP:
 			begin
-				case(baud_count_done & UART_Tx_RQST) 
+				case({baud_count_done, UART_Tx_RQST}) 
 					'b00:NST=STOP;
 					'b01:NST=STOP;
 					'b11:NST=uSTART;
