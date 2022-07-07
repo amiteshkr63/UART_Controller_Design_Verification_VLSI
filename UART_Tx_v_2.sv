@@ -18,7 +18,7 @@ wire baud_count_done;
 logic DATA_COUNTER_STATUS;
 
 //FSM STATES
-typedef enum{IDLE, uSTART, DATA, STOP}states;
+typedef enum{IDLE, START, DATA, STOP}states;
 states PST, NST;
 
 //Baud Count and Handling
@@ -85,13 +85,13 @@ always_comb begin
 		IDLE: 
 			begin
 				if (UART_Tx_RQST) begin
-					NST=uSTART;
+					NST=START;
 				end
 				else begin
 					NST=PST;
 				end
 			end
-		uSTART:
+		START:
 			begin
 				if (baud_count_done) begin
 					NST=DATA;
@@ -114,7 +114,7 @@ always_comb begin
 				case({baud_count_done, UART_Tx_RQST}) 
 					'b00:NST=STOP;
 					'b01:NST=STOP;
-					'b11:NST=uSTART;
+					'b11:NST=START;
 					default: NST=IDLE;
 				endcase
 			end
@@ -130,7 +130,7 @@ always_comb begin
 				UART_Tx_READY_BUSY=`Tx_READY;
 				UART_Tx_OUT=`UART_IDLE;
 			end
-		uSTART:	
+		START:	
 			begin
 				
 				UART_BUFFER=Tx_DATA;
