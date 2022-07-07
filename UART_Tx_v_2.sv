@@ -66,7 +66,9 @@ always@(posedge clk) begin
 		data_counter<=data_counter;
 	end
 end
-assign data_count_done=(data_counter=='d8)?1'b1:1'b0;
+
+//To denote DATA counter is done
+assign data_count_done=(data_counter=='d8 & baud_count_done)?1'b1:1'b0;
 //Present state Assignment
 always_ff @(posedge clk or posedge rst) begin 
 	if(rst) begin
