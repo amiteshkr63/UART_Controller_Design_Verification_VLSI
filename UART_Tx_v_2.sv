@@ -130,7 +130,7 @@ always_comb begin
 			end
 		uSTART:	
 			begin
-				DATA_COUNTER_STATUS=`COUNTER_START;
+				
 				UART_BUFFER=Tx_DATA;
 				UART_BUFFER[`WORD_LENGTH]=^UART_BUFFER[`WORD_LENGTH-1:0];
 				UART_Tx_READY_BUSY=`Tx_BUSY;
@@ -138,15 +138,18 @@ always_comb begin
 			end
 		DATA:
 			begin
-
+				DATA_COUNTER_STATUS=`COUNTER_START;
 				UART_Tx_READY_BUSY=`Tx_BUSY;
 				//UART_Tx_OUT=UART_BUFFER[0];				ERROR-> vlog-7033 (Error (suppressible): always_ff with ModelSim)
 				UART_Tx_OUT=UART_BUFFER[data_counter];
 				//UART_BUFFER=UART_BUFFER>>1;
+				if(data_counter=='d9) begin 
+					DATA_COUNTER_STATUS=`COUNTER_STOP;
+				end
 			end
 		STOP:
 			begin
-				DATA_COUNTER_STATUS=`COUNTER_STOP;
+				//DATA_COUNTER_STATUS=`COUNTER_STOP;
 				UART_BUFFER=0;
 				UART_Tx_READY_BUSY=`Tx_READY;
 				UART_Tx_OUT=`UART_STOP;
