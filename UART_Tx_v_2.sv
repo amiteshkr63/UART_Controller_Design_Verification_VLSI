@@ -143,7 +143,7 @@ always_comb begin
 				//UART_Tx_OUT=UART_BUFFER[0];				ERROR-> vlog-7033 (Error (suppressible): always_ff with ModelSim)
 				UART_Tx_OUT=UART_BUFFER[data_counter];
 				//UART_BUFFER=UART_BUFFER>>1;
-				if(data_counter=='d9) begin 
+				if(data_counter=='d8 & baud_count_done) begin //////////////////////////////////////
 					DATA_COUNTER_STATUS=`COUNTER_STOP;
 				end
 			end
