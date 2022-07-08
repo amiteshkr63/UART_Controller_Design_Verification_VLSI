@@ -1,16 +1,23 @@
 1.Questa Project compile
+
 `project comipleall`
 
 2.Simulation
+
 `vsim -novopt -suppress ALL <tb_module_name>`
+
 `vsim -novopt -suppress ALL <tb_module_name>`
 
 3.Simulation and FSM
+
 `vsim -voptargs=+acc -fsmdebug <tb_module_name>`
+
 (Note:Use enum data type for states name to see FSM)
 (Note: if you have used parameter as states name, then maybe you are not able to see FSM)
 (Note: if you are going to try to see fsm in older .mpf, then it might not work in fancy lapi)
 
 3.Simulation, FSM and RTL schematic
+
 `vsim -voptargs=+acc -fsmdebug -debugDB <tb_module_name>`
+
 sim>> left_click_<inst_name> >> Add to >> Schematic >> Full
