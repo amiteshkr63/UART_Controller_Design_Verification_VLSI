@@ -14,4 +14,5 @@ vsim -suppress ALL -voptargs=+acc -fsmdebug <tb_module_name>
 
 3.Simulation, FSM and RTL schematic
 vsim -voptargs=+acc -fsmdebug -debugDB <tb_module_name>
+vsim -suppress ALL -voptargs=+acc -fsmdebug -debugDB <tb_module_name>
 sim>> left_click_<inst_name> >> Add to >> Schematic >> Full
