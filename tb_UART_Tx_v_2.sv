@@ -19,7 +19,7 @@ module tb_UART_Tx_v_2 (); /* this is automatically generated */
 
 	// (*NOTE*) replace reset, clock, others
 
-	localparam  BAUD_COUNTER_MAX = `CLKRATE/`BAUD;
+	localparam  BAUD_COUNTER_MAX = (`Tx_CLKRATE)/(`BAUD);
 	localparam BAUD_COUNTER_SIZE = $clog2(BAUD_COUNTER_MAX);
 	localparam  TOTAL_DATA_COUNT = `WORD_LENGTH;
 	localparam DATA_COUNTER_SIZE = $clog2(`WORD_LENGTH);

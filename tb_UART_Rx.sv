@@ -25,6 +25,7 @@ module tb_UART_Rx (); /* this is automatically generated */
 	localparam   TOTAL_DATA_COUNT = `WORD_LENGTH;
 	localparam  DATA_COUNTER_SIZE = $clog2(`WORD_LENGTH);
 
+	logic					 rst;
 	logic                    UART_Tx_IN;
 	logic                    err_ack;
 	logic [`WORD_LENGTH-1:0] UART_pckt;
@@ -32,20 +33,52 @@ module tb_UART_Rx (); /* this is automatically generated */
 	UART_Rx inst_UART_Rx
 		(
 			.r_clk      (clk),
-			.r_rst      (clk),
+			.r_rst      (rst),
 			.UART_Tx_IN (UART_Tx_IN),
 			.err_ack    (err_ack),
 			.UART_pckt  (UART_pckt)
 		);
 
 	task init();
-		UART_Tx_IN <= '0;
+		rst  	   <='1;
+		UART_Tx_IN <= '1;
 	endtask
 
 	task drive(int iter);
-		for(int it = 0; it < iter; it++) begin
+		rst<='0;
+		repeat(iter) begin
 			UART_Tx_IN <= '0;
-			@(posedge clk);
+			repeat(rBAUD_COUNTER_MAX)@(posedge clk);
+
+			UART_Tx_IN <= '1;
+			repeat(rBAUD_COUNTER_MAX)@(posedge clk);
+
+			UART_Tx_IN <= '0;
+			repeat(rBAUD_COUNTER_MAX)@(posedge clk);
+
+			UART_Tx_IN <= '1;
+			repeat(rBAUD_COUNTER_MAX)@(posedge clk);
+
+			UART_Tx_IN <= '0;
+			repeat(rBAUD_COUNTER_MAX)@(posedge clk);
+
+			UART_Tx_IN <= '1;
+			repeat(rBAUD_COUNTER_MAX)@(posedge clk);
+
+			UART_Tx_IN <= '0;
+			repeat(rBAUD_COUNTER_MAX)@(posedge clk);
+
+			UART_Tx_IN <= '1;
+			repeat(rBAUD_COUNTER_MAX)@(posedge clk);
+
+			UART_Tx_IN <= '0;
+			repeat(rBAUD_COUNTER_MAX)@(posedge clk);
+
+			UART_Tx_IN <= '0;			;
+			repeat(rBAUD_COUNTER_MAX)@(posedge clk);
+
+			UART_Tx_IN <= '1;
+			repeat(rBAUD_COUNTER_MAX)@(posedge clk);
 		end
 	endtask
 
@@ -53,7 +86,7 @@ module tb_UART_Rx (); /* this is automatically generated */
 		// do something
 
 		init();
-		repeat(10)@(posedge clk);
+		repeat(rBAUD_COUNTER_MAX*10)@(posedge clk);
 
 		drive(20);
 

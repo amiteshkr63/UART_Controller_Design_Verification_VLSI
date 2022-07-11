@@ -3,6 +3,7 @@
 `define UART_STOP 1
 
 `define WORD_LENGTH 8
+`define PARITY_LENGTH 1
 
 `define COUNTER_START 1
 `define COUNTER_STOP 0

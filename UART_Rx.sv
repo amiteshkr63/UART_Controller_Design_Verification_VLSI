@@ -24,7 +24,7 @@ localparam rBAUD_COUNTER_MAX= `Rx_CLKRATE/`BAUD;
 localparam rBAUD_COUNTER_SIZE=$clog2(rBAUD_COUNTER_MAX);
 
 //Data Count and Handling
-localparam TOTAL_DATA_COUNT=`WORD_LENGTH;
+localparam TOTAL_DATA_COUNT=`WORD_LENGTH + `PARITY_LENGTH;
 localparam DATA_COUNTER_SIZE=$clog2(`WORD_LENGTH);
 
 //Baud and Data Counter
@@ -35,7 +35,7 @@ logic [DATA_COUNTER_SIZE:0]rdata_counter;
 reg temp;
 always@(posedge r_clk , posedge r_rst) begin
 	if (r_rst) begin
-		{temp, sync_UART_Tx_IN}<=2'b00;
+		{temp, sync_UART_Tx_IN}<=2'b11;
 	end
 	else begin
 		{temp, sync_UART_Tx_IN}<={UART_Tx_IN, temp};
@@ -52,17 +52,18 @@ always@(posedge r_clk) begin
 			rbaud_counter<=0;
 		end
 		else begin
-			rbaud_counter<=rbaud_counter+'d1;
+			rbaud_counter<=(NST!=IDLE)?rbaud_counter+'d1:rbaud_counter;//////////////////////////////
 		end
 	end
 end
 
 //To detect the "TICK"
-assign rbaud_count_done=(rbaud_counter==rBAUD_COUNTER_MAX)?1'b1:1'b0;
+assign rbaud_count_done=(rbaud_counter==rBAUD_COUNTER_MAX-'d1)?1'b1:1'b0;
+//Subtracted "1" to sync sync_UART_Tx_IN with rbaud_count_done
 
 //Data Counter Handling
 always@(posedge r_clk) begin
-	if (r_rst | rDATA_COUNTER_STATUS==`COUNTER_STOP | rdata_count_done) begin
+	if (r_rst || rdata_count_done || rDATA_COUNTER_STATUS==`COUNTER_STOP) begin
 		rdata_counter<=0;
 	end
 	else if(rbaud_count_done) begin
@@ -72,7 +73,7 @@ always@(posedge r_clk) begin
 		rdata_counter<=rdata_counter;
 	end
 end
-assign rdata_count_done=(rdata_counter==TOTAL_DATA_COUNT & rbaud_count_done)?1'b1:1'b0;
+assign rdata_count_done=((rdata_counter==(TOTAL_DATA_COUNT-'d1)) & rbaud_count_done)?1'b1:1'b0;
 
 //Present state assignments
 always_ff @(posedge r_clk or posedge r_rst) begin
@@ -126,14 +127,26 @@ always_comb begin
 end
 
 //UART_pckt and Error handlings
-always_comb begin
+//always_comb begin 	//To get rid of overwriting at the same location of UART_Buffer twice when sync_UART_Tx_IN changes
+always@(negedge rbaud_count_done) begin
 	case(PST)
-	IDLE:	{UART_pckt, err_ack}=2'b0;
-	START:	{UART_pckt, err_ack}=2'b0;
+	IDLE:	begin
+				{UART_pckt, err_ack}=2'b0;
+				rDATA_COUNTER_STATUS=`COUNTER_STOP;
+			end
+	START:	begin
+				{UART_pckt, err_ack}=2'b0;
+				UART_Rx_BUFFER='b0;
+				rDATA_COUNTER_STATUS=`COUNTER_STOP;
+			end
 	STORE:	
 		begin
+			rDATA_COUNTER_STATUS=`COUNTER_START;
 			{UART_pckt, err_ack}=2'b0;
-			UART_Rx_BUFFER[rdata_counter]=sync_UART_Tx_IN;
+			UART_Rx_BUFFER[rdata_counter]=(rbaud_count_done==1'b0)?sync_UART_Tx_IN:UART_Rx_BUFFER[rdata_counter];
+			if(rdata_counter=='d8 & rbaud_count_done) begin //////////////////////////////////////
+				rDATA_COUNTER_STATUS=`COUNTER_STOP;
+			end
 		end
 	PCKT_OUT:
 		begin
@@ -141,10 +154,10 @@ always_comb begin
 			if((UART_Rx_BUFFER[`WORD_LENGTH]==^UART_Rx_BUFFER[`WORD_LENGTH-1:0]) | sync_UART_Tx_IN) begin
 				//At this state we expect a STOP bit, if not raise errr
 				//Verifying parity, if not verified raise err
-				err_ack=`PCKT_NOT_OK;
+				err_ack=`PCKT_OK;
 			end
 			else begin
-				err_ack=`PCKT_OK;
+				err_ack=`PCKT_NOT_OK;
 			end
 		end
 	endcase 
