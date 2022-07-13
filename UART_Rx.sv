@@ -127,8 +127,8 @@ always_comb begin
 end
 
 //UART_pckt and Error handlings
-//always_comb begin 	//To get rid of overwriting at the same location of UART_Buffer twice when sync_UART_Tx_IN changes
-always@(negedge rbaud_count_done) begin
+always_comb begin 	//To get rid of overwriting at the same location of UART_Buffer twice when sync_UART_Tx_IN changes
+//always@(negedge rbaud_count_done) begin
 	case(PST)
 	IDLE:	begin
 				{UART_pckt, err_ack}=2'b0;
