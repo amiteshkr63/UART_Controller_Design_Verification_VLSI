@@ -51,7 +51,7 @@ always@(posedge clk) begin
 end
 
 //To detect the "TICK"
-assign baud_count_done=((baud_counter==BAUD_COUNTER_MAX))?1'b1:1'b0;
+assign baud_count_done=((baud_counter==BAUD_COUNTER_MAX-'d1))?1'b1:1'b0;
 //assign baud_count_done=(~|(baud_counter^BAUD_COUNTER_MAX))?1'b1:1'b0;
 
 //Data Counter Handling
