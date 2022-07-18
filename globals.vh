@@ -12,7 +12,7 @@
 `define Tx_READY 1
 
 `define Tx_CLKRATE 1_000_000
-`define Rx_CLKRATE 1_000_000
+`define Rx_CLKRATE 10_000_000
 `define BAUD 9600
 
 `define PCKT_OK 0

@@ -27,10 +27,11 @@ initial begin
 end
 
 always #1 t_clk=~t_clk;
-always #1 r_clk=~r_clk;
+//always #1 r_clk=~r_clk;			//When Rx CLK freq. 1MHz
+always #0.1 r_clk=~r_clk;			//When Rx CLK freq. 10MHz
 
 always begin
 	Tx_DATA=$random;
-	#10000;
+	#1000000;
 end
 endmodule : top_tb
